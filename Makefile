@@ -3,6 +3,7 @@ ROLES_PATH=roles
 TF_BINARY_URL=https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
 SCRATCH=tmp
 BINPATH=bin
+TFDIR=tf/gcp
 
 install-checkov:
 	virtualenv -p $$(which python3) $(VENV)
@@ -22,3 +23,6 @@ setup: install-checkov install-terraform
 	@echo "    source $(VENV)/bin/activate"
 	@echo Add the binary directory to your path with:
 	@echo "    export PATH=$$(pwd)/bin:\$$PATH"
+
+run-test:
+	checkov -d $(TFDIR)

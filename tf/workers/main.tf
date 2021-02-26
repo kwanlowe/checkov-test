@@ -13,8 +13,30 @@ resource "google_os_login_ssh_public_key" "cache" {
 }
 
 resource "google_compute_instance" "vm_instance" {
+  allow_stopping_for_update = true
   count = "3"
   name         = "vm-worker-${count.index + 1}"
+  machine_type = "n2-standard-2"
+  tags = ["kubespray-vm"]
+
+  boot_disk {
+    initialize_params {
+      # image = "debian-cloud/debian-9"
+      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+    }
+  }
+
+  network_interface {
+    # A default network is created for all GCP projects
+    network = google_compute_network.vpc_network.self_link
+    access_config {
+    }
+  }
+}
+
+
+resource "google_compute_instance" "vm_instance" {
+  name         = "vm-bastion-001"
   machine_type = "f1-micro"
   tags = ["kubespray-vm"]
 
@@ -41,6 +63,7 @@ resource "google_compute_network" "vpc_network" {
 resource "google_compute_firewall" "ssh-rule" {
   name = "allow-ssh"
   network = google_compute_network.vpc_network.name
+  allow { protocol = "icmp" }
   allow {
     protocol = "tcp"
     ports = ["22"]

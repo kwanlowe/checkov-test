@@ -1,5 +1,12 @@
 # checkov-test
 
+## GCP Notes
+Download the credentials then export the variable to point to the JSON file.
+
+    export GOOGLE_APPLICATION_CREDENTIALS=~/.ssh/kubespray-rccl-6c31ddf6cafa.json
+
+## Setup
+
 Quickstart should be:
 
     make setup

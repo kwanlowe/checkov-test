@@ -70,7 +70,7 @@ resource "google_compute_firewall" "fw-allow-ssh" {
   network = google_compute_network.vpc_network.name
   allow {
     protocol = "tcp"
-    ports = ["22", "80", "443", "6443","2379", "2380", "10250"]
+    ports = ["22"]
   }
   target_tags = ["kubespray-vm"]
   source_ranges = [var.client_external_ip]
@@ -79,10 +79,11 @@ resource "google_compute_firewall" "fw-allow-ssh" {
 resource "google_compute_firewall" "fw-allow-kubeports" {
   name = "fw-allow-kubeports"
   network = google_compute_network.vpc_network.name
+  allow { protocol = "icmp" }
   allow {
     protocol = "tcp"
     ports = ["80", "443", "6443","2379", "2380", "10250"]
   }
   target_tags = ["kubespray-vm"]
-  source_ranges = ["73.46.216.205/32"]
+  source_ranges = ["10.128.0.0/24"]
 }

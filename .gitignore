@@ -5,3 +5,5 @@ tmp/
 terraform.tfstate*
 .terraform.lock*
 *.swp
+.terraform
+.terraform.lock.hcl

@@ -10,8 +10,7 @@ Download the credentials then export the variable to point to the JSON file.
 Quickstart should be:
 
     make setup
-    source python\_venv/bin/active
-    export PATH=$(pwd)/bin:$PATH
+	source setup.env
 
 Once setup, initialize the Terraform environment and apply. This example is in GCP and creates a free-tier resource.
 

@@ -1,3 +1,7 @@
 python_venv/
 bin/
 tmp/
+.terraform/
+terraform.tfstate*
+.terraform.lock*
+*.swp

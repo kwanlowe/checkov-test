@@ -34,8 +34,9 @@ install-terraform:
 	pwd
 
 generate-inventory:
-	@gcloud compute instances list|awk 'BEGIN{print"[workers]\n"} NR>1 && /worker/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}'
-	@gcloud compute instances list|awk 'BEGIN{print"[jumpoff]\n"} NR>1 && /bastion/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}'
+	mkdir -p inventory
+	@gcloud compute instances list|awk 'BEGIN{print"[workers]\n"} NR>1 && /worker/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}' >inventory/hosts
+	@gcloud compute instances list|awk 'BEGIN{print"[jumpoff]\n"} NR>1 && /bastion/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}' >>inventory/hosts
 
 setup: install-ansible install-terraform
 	@echo Enable the python virtual environment with:
@@ -60,7 +61,7 @@ deploy-gcp-kubespray:
 	cd tf/workers && terraform init && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
 
 generate-private-key:
-	mkdir -p keys
+	mkdir -p playbooks/keys
 	test ! -f playbooks/keys/jumpoff && ssh-keygen -b 4096 -t rsa -f playbooks/keys/jumpoff 
 
 setup-jumpoff-host:

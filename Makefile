@@ -22,7 +22,8 @@ install-terraform:
 	pwd
 
 generate-inventory:
-	@gcloud compute instances list|awk 'BEGIN{print"[kubespray]\n"} NR>1{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}'
+	@gcloud compute instances list|awk 'BEGIN{print"[workers]\n"} NR>1 && /worker/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}'
+	@gcloud compute instances list|awk 'BEGIN{print"[jumpoff]\n"} NR>1 && /bastion/{printf "%s ansible_ssh_private_key_file=$(PRIVKEY)\n", $$5}'
 
 setup: install-ansible install-terraform
 	@echo Enable the python virtual environment with:
@@ -37,3 +38,20 @@ deploy-gcp-single-node:
 	@ $(eval CLIENT_EXTERNAL_IP=$(shell sh -c "curl ifconfig.me 2>/dev/null"))
 	@echo $(CLIENT_EXTERNAL_IP)/32
 	cd tf/gcp && terraform init && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
+
+destroy-gcp-single-node:
+	cd tf/gcp && terraform destroy
+
+deploy-gcp-kubespray:
+	@ $(eval CLIENT_EXTERNAL_IP=$(shell sh -c "curl ifconfig.me 2>/dev/null"))
+	@echo $(CLIENT_EXTERNAL_IP)/32
+	cd tf/workers && terraform init && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
+
+generate-private-key:
+	mkdir -p keys
+	test ! -f playbooks/keys/jumpoff && ssh-keygen -b 4096 -t rsa -f playbooks/keys/jumpoff 
+
+setup-jumpoff-host:
+	@ $(eval GCLOUD_REMOTE_USER=$(shell sh -c 'gcloud compute ssh vm-bastion-001 --command "whoami"' )) 
+	@echo $(GCLOUD_REMOTE_USER)
+	ansible-playbook playbooks/setup-hosts.yml -C -i inventory/hosts -e "gcloud_remote_user=$(GCLOUD_REMOTE_USER)"

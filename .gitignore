@@ -7,3 +7,5 @@ terraform.tfstate*
 *.swp
 .terraform
 .terraform.lock.hcl
+playbooks/keys/
+inventory/

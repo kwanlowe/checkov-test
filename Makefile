@@ -1,16 +1,28 @@
 VENV=python_venv
 ROLES_PATH=roles
 TF_BINARY_URL=https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
+GCP_BINARY_URL=https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-330.0.0-linux-x86_64.tar.gz
 SCRATCH=tmp
 BINPATH=bin
 TFDIR=tf/gcp
 PRIVKEY=/home/kwan/.ssh/google_compute_engine
 
+install-google-cloud-sdk:
+	mkdir -p $(SCRATCH) $(BINPATH)
+	# wget -P tmp/ $(GCP_BINARY_URL)
+	@$(eval GCP_BASENAME=$(shell sh -c "basename $(GCP_BINARY_URL)"))
+	tar xf $(SCRATCH)/$(GCP_BASENAME) -C $(SCRATCH)/
+	mv $(SCRATCH)/google-cloud-sdk $(BINPATH)
+	
+install-checkov:
+	virtualenv -p $$(which python3) $(VENV)
+	$(VENV)/bin/pip install -r requirements.txt
+	mkdir -p $(ROLES_PATH)
+
 install-ansible:
 	virtualenv -p $$(which python3) $(VENV)
 	$(VENV)/bin/pip install -r requirements.txt
 	mkdir -p $(ROLES_PATH)
-	# $(VENV)/bin/ansible-galaxy install --roles-path $(ROLES_PATH) geerlingguy.docker
 
 install-terraform:
 	mkdir -p $(SCRATCH) $(BINPATH)

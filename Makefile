@@ -9,7 +9,7 @@ PRIVKEY=/home/kwan/.ssh/google_compute_engine
 
 install-google-cloud-sdk:
 	mkdir -p $(SCRATCH) $(BINPATH)
-	# wget -P tmp/ $(GCP_BINARY_URL)
+	wget -P tmp/ $(GCP_BINARY_URL)
 	@$(eval GCP_BASENAME=$(shell sh -c "basename $(GCP_BINARY_URL)"))
 	tar xf $(SCRATCH)/$(GCP_BASENAME) -C $(SCRATCH)/
 	mv $(SCRATCH)/google-cloud-sdk $(BINPATH)

@@ -78,6 +78,7 @@ setup-jumpoff-privkey:
 setup-jumpoff-kubespray:
 	@echo Installing ansible and other required tools. This will take about 10 minutes.
 	ansible-playbook playbooks/setup-kubespray.yml -i inventory/hosts 
+	ansible-playbook playbooks/download-kubectl.yml -i inventory/hosts 
 	@echo
 	@echo The jumpoff host should be ready. Run the following commands:
 	@echo "    gcloud compute ssh vm-bastion-001"
@@ -103,7 +104,4 @@ generate-kubespray-inventory-local:
 	@echo -n "    "
 	@echo 'CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inventory.py $${IPS[@]}'
 
-setup-jumpoff-install-kubectl:
-	@echo Installing kubectl
-	ansible-playbook playbooks/download-kubectl.yml -i inventory/hosts 
 	

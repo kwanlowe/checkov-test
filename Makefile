@@ -76,4 +76,29 @@ setup-jumpoff-privkey:
 	ansible-playbook playbooks/setup-host-privkey.yml  -i inventory/hosts -e "gcloud_remote_user=$(GCLOUD_REMOTE_USER)" 
 
 setup-jumpoff-kubespray:
+	@echo Installing ansible and other required tools. This will take about 10 minutes.
 	ansible-playbook playbooks/setup-kubespray.yml -i inventory/hosts 
+	@echo
+	@echo The jumpoff host should be ready. Run the following commands:
+	@echo "    gcloud compute ssh vm-bastion-001"
+	@echo "If prompted, follow the gcloud authentication prompts."
+	@echo "Once logged into the remote:"
+	@echo "    source ~/bin/python_vebv/bin/activate"
+
+generate-kubespray-inventory-jumpoff:
+	@echo "Run the following commands in the remote (jumpoff) shell:"
+	@echo -n "    "
+	@echo cd src/kubespray
+	@echo -n "    "
+	@gcloud compute instances list|awk 'BEGIN {printf "declare -a IPS=("} NR>1 && /worker/{printf "%s ", $$4} END{print ")\n"}'
+	@echo -n "    "
+	@echo 'CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inventory.py $${IPS[@]}'
+
+generate-kubespray-inventory-local:
+	@echo Run the following commands in shell:
+	@echo -n "    "
+	@echo cd src/kubespray
+	@echo -n "    "
+	@gcloud compute instances list|awk 'BEGIN {printf "declare -a IPS=("} NR>1{printf "%s ", $$5} END{print ")\n"}'
+	@echo -n "    "
+	@echo 'CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inventory.py $${IPS[@]}'

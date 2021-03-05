@@ -102,3 +102,8 @@ generate-kubespray-inventory-local:
 	@gcloud compute instances list|awk 'BEGIN {printf "declare -a IPS=("} NR>1{printf "%s ", $$5} END{print ")\n"}'
 	@echo -n "    "
 	@echo 'CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inventory.py $${IPS[@]}'
+
+setup-jumpoff-install-kubectl:
+	@echo Installing kubectl
+	ansible-playbook playbooks/download-kubectl.yml -i inventory/hosts 
+	

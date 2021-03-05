@@ -82,7 +82,7 @@ resource "google_compute_firewall" "fw-allow-kubeports" {
   allow { protocol = "icmp" }
   allow {
     protocol = "tcp"
-    ports = ["80", "443", "6443","2379", "2380", "10250"]
+    ports = ["22", "80", "443", "6443","2379", "2380", "10250"]
   }
   target_tags = ["kubespray-vm"]
   source_ranges = ["10.128.0.0/24"]

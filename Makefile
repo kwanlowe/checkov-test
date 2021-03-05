@@ -47,10 +47,13 @@ setup: install-ansible install-terraform
 run-test:
 	checkov -d $(TFDIR)
 
+terraform-init-workers:
+	cd tf/workers && terraform init
+
 deploy-gcp-single-node:
 	@ $(eval CLIENT_EXTERNAL_IP=$(shell sh -c "curl ifconfig.me 2>/dev/null"))
 	@echo $(CLIENT_EXTERNAL_IP)/32
-	cd tf/gcp && terraform init && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
+	cd tf/gcp && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
 
 destroy-gcp-single-node:
 	cd tf/gcp && terraform destroy
@@ -58,13 +61,19 @@ destroy-gcp-single-node:
 deploy-gcp-kubespray:
 	@ $(eval CLIENT_EXTERNAL_IP=$(shell sh -c "curl ifconfig.me 2>/dev/null"))
 	@echo $(CLIENT_EXTERNAL_IP)/32
-	cd tf/workers && terraform init && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
+	cd tf/workers && terraform apply -var="client_external_ip=$(CLIENT_EXTERNAL_IP)/32"
 
 generate-private-key:
 	mkdir -p playbooks/keys
 	test ! -f playbooks/keys/jumpoff && ssh-keygen -b 4096 -t rsa -f playbooks/keys/jumpoff 
 
-setup-jumpoff-host:
+setup-workers-pubkey:
 	@ $(eval GCLOUD_REMOTE_USER=$(shell sh -c 'gcloud compute ssh vm-bastion-001 --command "whoami"' )) 
-	@echo $(GCLOUD_REMOTE_USER)
-	ansible-playbook playbooks/setup-hosts.yml -C -i inventory/hosts -e "gcloud_remote_user=$(GCLOUD_REMOTE_USER)"
+	ansible-playbook playbooks/setup-worker-pubkey.yml  -i inventory/hosts -e "gcloud_remote_user=$(GCLOUD_REMOTE_USER)"
+
+setup-jumpoff-privkey:
+	@ $(eval GCLOUD_REMOTE_USER=$(shell sh -c 'gcloud compute ssh vm-bastion-001 --command "whoami"' )) 
+	ansible-playbook playbooks/setup-host-privkey.yml  -i inventory/hosts -e "gcloud_remote_user=$(GCLOUD_REMOTE_USER)" 
+
+setup-jumpoff-kubespray:
+	ansible-playbook playbooks/setup-kubespray.yml -i inventory/hosts 

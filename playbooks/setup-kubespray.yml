@@ -1,0 +1,16 @@
+- name: Install private key
+  hosts: jumpoff
+
+  tasks:
+
+  - name: Install the latest version of Apache and MariaDB
+    ansible.builtin.package:
+      name:
+        - make
+      state: latest 
+    become: true
+
+  - name: Git checkout
+    ansible.builtin.git:
+      repo: 'https://github.com/kubernetes-sigs/kubespray.git'
+      dest: ~/src/kubespray
